@@ -33,4 +33,12 @@ public class AuthService {
 
         return null;
     }
+
+    public void stop() {
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

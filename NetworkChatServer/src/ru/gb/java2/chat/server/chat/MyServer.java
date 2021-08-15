@@ -24,6 +24,8 @@ public class MyServer {
         } catch (IOException e) {
             System.err.println("Failed to bind port " + port);
             e.printStackTrace();
+        } finally {
+            authService.stop();
         }
     }
 
