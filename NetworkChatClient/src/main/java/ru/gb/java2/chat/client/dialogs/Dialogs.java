@@ -26,6 +26,7 @@ public class Dialogs {
     public enum NetworkError {
         SEND_MESSAGE("Не удалось отправить сообщение!"),
         SERVER_CONNECT("Не удалось установить соединение с сервером!"),
+        RENAME_ERROR("Не удалось сменить ник")
         ;
 
         private static final String TITLE = "Сетевая ошибка";

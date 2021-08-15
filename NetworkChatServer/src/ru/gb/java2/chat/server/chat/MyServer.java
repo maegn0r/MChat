@@ -88,4 +88,8 @@ public class MyServer {
         }
 
     }
+
+    public void notifyAboutNickChange() throws IOException {
+        notifyClientsUsersListUpdated();
+    }
 }
