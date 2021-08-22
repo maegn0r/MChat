@@ -1,9 +1,13 @@
 package ru.gb.java2.chat.client.model;
 
+import ru.gb.java2.chat.client.ClientChat;
+import ru.gb.java2.chat.client.controllers.ChatController;
 import ru.gb.java2.chat.clientserver.Command;
 
+import java.awt.*;
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 

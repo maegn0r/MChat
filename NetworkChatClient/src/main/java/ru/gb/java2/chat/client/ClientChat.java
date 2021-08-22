@@ -2,6 +2,8 @@ package ru.gb.java2.chat.client;
 
 
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
@@ -9,10 +11,16 @@ import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import ru.gb.java2.chat.client.controllers.AuthController;
 import ru.gb.java2.chat.client.controllers.ChatController;
 
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Scanner;
 
 
 public class ClientChat extends Application {
@@ -20,11 +28,13 @@ public class ClientChat extends Application {
 
     private static final String CHAT_WINDOW_FXML = "chat.fxml";
     private static final String AUTH_DIALOG_FXML = "authDialog.fxml";
+    private static final String FILE_NAME = "chatHistory.txt";
 
     private Stage primaryStage;
     private Stage authStage;
     private FXMLLoader chatWindowLoader;
     private FXMLLoader authLoader;
+    private int historyLinesCount;
 
 
     @Override
@@ -37,6 +47,7 @@ public class ClientChat extends Application {
         this.primaryStage = primaryStage;
         initViews();
         getChatStage().show();
+        loadHistory();
         getAuthStage().show();
         getAuthController().initMessageHandler();
     }
@@ -66,10 +77,16 @@ public class ClientChat extends Application {
         chatWindowLoader = new FXMLLoader();
         chatWindowLoader.setLocation(ClientChat.class.getResource(CHAT_WINDOW_FXML));
 
+        primaryStage.setOnCloseRequest(event -> {
+            saveHistory();
+            Platform.exit();
+        });
+
         Parent root = chatWindowLoader.load();
         this.primaryStage.setScene(new Scene(root));
 
         setStageForSecondScreen(primaryStage);
+
     }
 
 
@@ -120,7 +137,33 @@ public class ClientChat extends Application {
         getPrimaryStage().setTitle(newUserName);
     }
 
+    private void saveHistory() {
+        String[] history = ClientChat.INSTANCE.getChatController().getChatHistory().getText().split("\\n");
+        if (history.length == historyLinesCount){
+            return;
+        } else {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (int i = historyLinesCount; i < history.length; i++) {
+                    stringBuilder.append(history[i]).append("\n");
+            }
+            try (PrintWriter printWriter = new PrintWriter(new FileWriter(FILE_NAME,StandardCharsets.UTF_8, true))){
+                printWriter.println(stringBuilder.toString());
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+    }
+
     public String getTitle(){
         return getPrimaryStage().getTitle();
+    }
+
+    private void loadHistory() throws IOException {
+        List<String> previousMessages = Files.readAllLines(Paths.get(FILE_NAME));
+        historyLinesCount = previousMessages.size() >=100 ? 100 : previousMessages.size();
+        int startIndex = previousMessages.size() >= 100 ? previousMessages.size()-100 : 0;
+        for (int i = startIndex; i < previousMessages.size(); i++) {
+            ClientChat.INSTANCE.getChatController().getChatHistory().appendText(previousMessages.get(i) + "\n");
+        }
     }
 }
