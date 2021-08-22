@@ -116,4 +116,11 @@ public class ClientChat extends Application {
         getAuthController().close();
         getAuthStage().close();
     }
+    public void setNewUserName(String newUserName){
+        getPrimaryStage().setTitle(newUserName);
+    }
+
+    public String getTitle(){
+        return getPrimaryStage().getTitle();
+    }
 }

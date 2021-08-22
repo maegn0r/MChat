@@ -24,6 +24,8 @@ public class MyServer {
         } catch (IOException e) {
             System.err.println("Failed to bind port " + port);
             e.printStackTrace();
+        } finally {
+            authService.stop();
         }
     }
 
@@ -85,5 +87,9 @@ public class MyServer {
             client.sendCommand(Command.updateUsersListCommand(users));
         }
 
+    }
+
+    public void notifyAboutNickChange() throws IOException {
+        notifyClientsUsersListUpdated();
     }
 }

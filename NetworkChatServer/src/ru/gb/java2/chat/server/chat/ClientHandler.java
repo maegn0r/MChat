@@ -5,6 +5,7 @@ import ru.gb.java2.chat.clientserver.CommandType;
 import ru.gb.java2.chat.clientserver.commands.AuthCommandData;
 import ru.gb.java2.chat.clientserver.commands.PrivateMessageCommandData;
 import ru.gb.java2.chat.clientserver.commands.PublicMessageCommandData;
+import ru.gb.java2.chat.clientserver.commands.RenameCommandData;
 
 import java.io.*;
 import java.net.Socket;
@@ -128,6 +129,20 @@ public class ClientHandler {
                     server.sendPrivateMessage(this, recipient, privateMessage);
                     break;
                 }
+
+                case RENAME: {
+                    RenameCommandData data = (RenameCommandData) command.getData();
+                    String newName = data.getNicknameToRename();
+                    boolean result = server.getAuthService().tryRename(this, newName);
+                    if (!result) {sendCommand(Command.errorCommand("Не удалось поменять ник! Неверные данные!"));
+                    } else {
+                        this.username = newName;
+                        sendCommand(Command.renameOkCommand(newName));
+                        server.notifyAboutNickChange();
+                    }
+
+                    break;
+                }
                 case PUBLIC_MESSAGE: {
                     PublicMessageCommandData data = (PublicMessageCommandData) command.getData();
                     processMessage(data.getMessage());
@@ -147,4 +162,6 @@ public class ClientHandler {
     public String getUsername() {
         return username;
     }
+
+
 }

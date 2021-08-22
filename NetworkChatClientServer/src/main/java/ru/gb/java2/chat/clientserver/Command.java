@@ -60,6 +60,19 @@ public class Command implements Serializable {
         return command;
     }
 
+    public static Command renameCommand(String nicknameToRename){
+        Command command = new Command();
+        command.type = CommandType.RENAME;
+        command.data = new RenameCommandData(nicknameToRename);
+        return command;
+    }
+    public static Command renameOkCommand(String newUsername) {
+        Command command = new Command();
+        command.data = new RenameOkCommand(newUsername);
+        command.type = CommandType.RENAME_OK;
+        return command;
+    }
+
     public static Command updateUsersListCommand(List<String> users) {
         Command command = new Command();
         command.type = CommandType.UPDATE_USERS_LIST;

@@ -159,4 +159,8 @@ public class Network {
     public String getLastPassword() {
         return lastPassword;
     }
+
+    public void sendRenameMessage(String newName) throws IOException {
+        sendCommand(Command.renameCommand(newName));
+    }
 }

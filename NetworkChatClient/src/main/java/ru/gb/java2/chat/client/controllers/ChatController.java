@@ -9,15 +9,18 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import ru.gb.java2.chat.client.ClientChat;
 import ru.gb.java2.chat.client.dialogs.Dialogs;
 import ru.gb.java2.chat.client.model.Network;
 import ru.gb.java2.chat.client.model.ReadCommandListener;
 import ru.gb.java2.chat.clientserver.Command;
 import ru.gb.java2.chat.clientserver.CommandType;
 import ru.gb.java2.chat.clientserver.commands.ClientMessageCommandData;
+import ru.gb.java2.chat.clientserver.commands.RenameOkCommand;
 import ru.gb.java2.chat.clientserver.commands.UpdateUsersListCommandData;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
@@ -28,6 +31,8 @@ public class ChatController {
     private ListView<String> usersList;
     @FXML
     private Button reconnectButton;
+    @FXML
+    private Button renameButton;
     @FXML
     private Button sendButton;
     @FXML
@@ -96,6 +101,12 @@ public class ChatController {
                 } else if (command.getType() == CommandType.UPDATE_USERS_LIST) {
                     UpdateUsersListCommandData data = (UpdateUsersListCommandData) command.getData();
                     updateUsersList(data.getUsers());
+                } else if(command.getType() == CommandType.RENAME_OK){
+
+                    Platform.runLater(() -> ClientChat.INSTANCE.setNewUserName(((RenameOkCommand) command.getData()).getUsername()));
+
+                } else if (command.getType() == CommandType.ERROR){
+                    Dialogs.NetworkError.RENAME_ERROR.show();
                 }
             }
         });
@@ -120,5 +131,16 @@ public class ChatController {
         } catch (Exception e) {
             Dialogs.NetworkError.SEND_MESSAGE.show();
         }
+    }
+
+    public void renameToServer(ActionEvent actionEvent) {
+        if(messageTextArea.getText().isBlank()) return;
+        Network network = Network.getInstance();
+        try{
+            network.sendRenameMessage(messageTextArea.getText());
+        } catch (IOException e) {
+            Dialogs.NetworkError.SEND_MESSAGE.show();
+        };
+        messageTextArea.clear();
     }
 }
