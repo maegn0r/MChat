@@ -8,16 +8,28 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 public class MyServer {
 
     private final List<ClientHandler> clients = new ArrayList<>();
     private AuthService authService;
+    private ExecutorService executorService;
 
     public void start(int port) {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Server has been started");
             authService = new AuthService();
+            executorService = Executors.newCachedThreadPool(new ThreadFactory() {
+                @Override
+                public Thread newThread(Runnable r) {
+                    Thread thread = new Thread(r);
+                    thread.setDaemon(true);
+                    return thread;
+                }
+            });
             while (true) {
                 waitAndProcessNewClientConnection(serverSocket);
             }
@@ -32,7 +44,7 @@ public class MyServer {
         Socket clientSocket = serverSocket.accept();
         System.out.println("Client has been connected");
         ClientHandler clientHandler = new ClientHandler(this, clientSocket);
-        clientHandler.handle();
+        clientHandler.handle(executorService);
     }
 
     public synchronized void broadcastMessage(String message, ClientHandler sender) throws IOException {
@@ -84,6 +96,5 @@ public class MyServer {
         for (ClientHandler client : clients) {
             client.sendCommand(Command.updateUsersListCommand(users));
         }
-
     }
 }
