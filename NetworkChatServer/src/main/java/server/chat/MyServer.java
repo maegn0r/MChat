@@ -1,7 +1,9 @@
-package ru.gb.java2.chat.server.chat;
+package server.chat;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.gb.java2.chat.clientserver.Command;
-import ru.gb.java2.chat.server.chat.auth.AuthService;
+import server.chat.auth.AuthService;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -13,14 +15,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 public class MyServer {
-
+    private static final Logger logger = LoggerFactory.getLogger(MyServer.class);
     private final List<ClientHandler> clients = new ArrayList<>();
     private AuthService authService;
     private ExecutorService executorService;
 
     public void start(int port) {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("Server has been started");
+            logger.info("Server has been started");
             authService = new AuthService();
             executorService = Executors.newCachedThreadPool(new ThreadFactory() {
                 @Override
@@ -34,7 +36,7 @@ public class MyServer {
                 waitAndProcessNewClientConnection(serverSocket);
             }
         } catch (IOException e) {
-            System.err.println("Failed to bind port " + port);
+            logger.error("Failed to bind port " + port);
             e.printStackTrace();
         } finally {
             authService.stop();
@@ -42,9 +44,9 @@ public class MyServer {
     }
 
     private void waitAndProcessNewClientConnection(ServerSocket serverSocket) throws IOException {
-        System.out.println("Waiting for new client connection...");
+        logger.info("Waiting for new client connection...");
         Socket clientSocket = serverSocket.accept();
-        System.out.println("Client has been connected");
+        logger.info("Client has been connected");
         ClientHandler clientHandler = new ClientHandler(this, clientSocket);
         clientHandler.handle(executorService);
     }

@@ -1,5 +1,8 @@
-package ru.gb.java2.chat.server.chat;
+package server.chat;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.gb.java2.chat.clientserver.Command;
 import ru.gb.java2.chat.clientserver.CommandType;
 import ru.gb.java2.chat.clientserver.commands.AuthCommandData;
@@ -7,14 +10,16 @@ import ru.gb.java2.chat.clientserver.commands.PrivateMessageCommandData;
 import ru.gb.java2.chat.clientserver.commands.PublicMessageCommandData;
 import ru.gb.java2.chat.clientserver.commands.RenameCommandData;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 
 public class ClientHandler {
-
+    private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
     private static final int CONNECTION_REFUSE_TIMEOUT = 120_00;
     private final MyServer server;
     private final Socket clientSocket;
@@ -35,12 +40,13 @@ public class ClientHandler {
                 authentication();
                 readMessages();
             } catch (IOException e) {
-                System.err.println("Failed to process message from client");
+                logger.error("Failed to process message from client");
             } finally {
                 try {
                     closeConnection();
                 } catch (IOException e) {
-                    System.err.println("Failed to close connection");
+                    logger.error("Failed to close connection");
+
                 }
             }
         });
@@ -101,7 +107,7 @@ public class ClientHandler {
         try {
             command = (Command) inputStream.readObject();
         } catch (ClassNotFoundException e) {
-            System.err.println("Failed to read Command class");
+            logger.error("Failed to read Command class");
             e.printStackTrace();
         }
         return command;

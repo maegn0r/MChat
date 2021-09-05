@@ -1,10 +1,13 @@
-package ru.gb.java2.chat.server.chat.auth;
+package server.chat.auth;
 
-import ru.gb.java2.chat.server.chat.ClientHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import server.chat.ClientHandler;
 
 import java.sql.*;
 
 public class AuthService {
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     private Connection connection;
     private PreparedStatement findByLogin;
@@ -13,7 +16,7 @@ public class AuthService {
     public AuthService() {
         try {
             connection = DriverManager.getConnection("jdbc:sqlite:auth_base.db");
-            System.out.println("DataBase connection up.");
+            logger.info("DataBase connection up.");
             findByLogin = connection.prepareStatement("SELECT * FROM AUTHENTICATION WHERE LOGIN = ? AND PASSWORD = ?");
             rename = connection.prepareStatement("UPDATE AUTHENTICATION SET nickname = ? WHERE nickname = ?");
         } catch (SQLException e) {
