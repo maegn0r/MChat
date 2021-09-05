@@ -143,4 +143,9 @@ public class ChatController {
         };
         messageTextArea.clear();
     }
+
+    public TextArea getChatHistory() {
+        return chatHistory;
+    }
+
 }
