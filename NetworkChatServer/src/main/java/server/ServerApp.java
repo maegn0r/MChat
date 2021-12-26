@@ -1,6 +1,7 @@
-package ru.gb.java2.chat.server;
+package server;
 
-import ru.gb.java2.chat.server.chat.MyServer;
+
+import server.chat.MyServer;
 
 public class ServerApp {
 

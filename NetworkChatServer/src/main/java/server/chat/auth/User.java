@@ -1,4 +1,4 @@
-package ru.gb.java2.chat.server.chat.auth;
+package server.chat.auth;
 
 import java.util.Objects;
 
